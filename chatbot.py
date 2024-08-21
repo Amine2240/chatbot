@@ -3,7 +3,8 @@ from tensorflow.keras.models import load_model # type: ignore
 import json
 import random
 import os
-import tensorflow as tf
+import spacy
+nlp = spacy.load('en_core_web_sm')
 
 # Suppress TensorFlow logging (only show errors)
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -18,7 +19,9 @@ fitted_cv = pickle.load(open('fitted_cv.pkl' , 'rb'))
 model = load_model('mychatbot_model.keras')
 
 def predict_class(sentence):
-  sentence = [sentence]
+  doc = nlp(sentence)
+  sentence = [token.lemma_ for token in doc]
+  # sentence = [sentence]
   x_test = fitted_cv.transform(sentence).toarray()
   y_pred = model.predict(x_test)[0]
   error_threshold = 0.25
